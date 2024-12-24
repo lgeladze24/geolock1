@@ -1,0 +1,1 @@
+# Leave empty for now - we'll add Pydantic models later
