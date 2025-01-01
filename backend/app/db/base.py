@@ -1,23 +1,32 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm import Session
-
+from supabase import create_client, Client
 from app.core.config import settings
+from typing import Generator
 
-# Create SQLAlchemy engine
-engine = create_engine(settings.DATABASE_URL)
+def get_supabase() -> Client:
+    """
+    Get Supabase client with anonymous key (for public operations)
+    """
+    return create_client(
+        settings.SUPABASE_URL,
+        settings.SUPABASE_ANON_KEY
+    )
 
-# Create SessionLocal class
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+def get_supabase_admin() -> Client:
+    """
+    Get Supabase client with service role key (for admin operations)
+    """
+    return create_client(
+        settings.SUPABASE_URL,
+        settings.SUPABASE_SERVICE_ROLE
+    )
 
-# Create Base class
-Base = declarative_base()
-
-# Dependency
-def get_db() -> Session:
-    db = SessionLocal()
+def get_db() -> Generator[Client, None, None]:
+    """
+    Dependency for FastAPI endpoints
+    """
+    db = get_supabase()
     try:
         yield db
     finally:
-        db.close()
+        # Supabase client doesn't need explicit cleanup
+        pass

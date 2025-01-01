@@ -1,1 +1,1 @@
-from .base import Base, engine, get_db
+from .base import get_db, get_supabase, get_supabase_admin
